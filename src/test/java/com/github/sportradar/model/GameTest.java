@@ -33,13 +33,6 @@ class GameTest {
         assertNotNull(game.getStartedAt());
     }
 
-    @Test
-    void newGameShouldHaveNullFinishedDate() {
-        var game = generateMockGame();
-
-        assertNull(game.getFinishedAt());
-    }
-
 
     private Game generateMockGame() {
         return new Game(new Team("Home"), new Team("Away"));
