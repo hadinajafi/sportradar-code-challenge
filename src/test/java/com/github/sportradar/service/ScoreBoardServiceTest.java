@@ -3,9 +3,13 @@ package com.github.sportradar.service;
 import com.github.sportradar.model.Team;
 import org.junit.jupiter.api.Test;
 
+import java.util.MissingResourceException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ScoreBoardServiceTest {
 
@@ -59,4 +63,38 @@ class ScoreBoardServiceTest {
         assertEquals(0, second.getScore().homeScore());
         assertEquals(0, second.getScore().awayScore());
     }
+
+    @Test
+    void getRunningGameWorks() {
+        var first = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        var second = scoreBoardService.startGame(new Team("Team3"), new Team("Team4"));
+
+        var game = scoreBoardService.getRunningGame(first.getUuid());
+
+        assertEquals(first.getUuid(), game.getUuid());
+        assertEquals(first.getStartedAt(), game.getStartedAt());
+        assertEquals(first.getScore(), game.getScore());
+        assertNotEquals(second.getUuid(), game.getUuid());
+    }
+
+    @Test
+    void finishGameShouldWork() {
+        var game = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+
+        scoreBoardService.finishGame(game.getUuid());
+
+        assertNotNull(game.getFinishedAt());
+    }
+
+    @Test
+    void finishGameShouldRemoveTheGameFromScoreBoard() {
+        var game = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+
+        scoreBoardService.finishGame(game.getUuid());
+
+        assertThrows(MissingResourceException.class, () -> {
+            scoreBoardService.getRunningGame(game.getUuid());
+        });
+    }
+
 }

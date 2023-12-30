@@ -29,6 +29,10 @@ public class Game {
         this.score = score;
     }
 
+    public void setFinishedAt(OffsetDateTime finishedAt) {
+        this.finishedAt = finishedAt;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
