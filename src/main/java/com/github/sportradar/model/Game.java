@@ -21,8 +21,12 @@ public class Game {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.uuid = UUID.randomUUID();
-        this.score = new Score(this.uuid, 0, 0);
+        this.score = new Score(0, 0);
         this.startedAt = OffsetDateTime.now();
+    }
+
+    public void setScore(Score score) {
+        this.score = score;
     }
 
     public UUID getUuid() {
