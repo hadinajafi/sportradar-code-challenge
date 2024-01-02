@@ -1,6 +1,8 @@
 package com.github.sportradar.service;
 
+import com.github.sportradar.model.Game;
 import com.github.sportradar.model.Team;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.MissingResourceException;
@@ -84,7 +86,7 @@ class ScoreBoardServiceTest {
     }
 
     @Test
-    void finishGameShouldWork() {
+    void finishGameShouldHaveFinishedDate() {
         var game = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
 
         scoreBoardService.finishGame(game.getUuid());
@@ -111,6 +113,20 @@ class ScoreBoardServiceTest {
         assertThrows(MissingResourceException.class, () -> {
             scoreBoardService.updateScore(game.getUuid(), 1, 0);
         });
+    }
+
+    @Test
+    void getRunningGamesShouldOrderedByTotalScore() {
+        var game1 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        var game2 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        var game3 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+
+        scoreBoardService.updateScore(game1.getUuid(), 1, 0);
+        scoreBoardService.updateScore(game2.getUuid(), 1, 2);
+        scoreBoardService.updateScore(game3.getUuid(), 0, 2);
+
+        Assertions.assertThat(scoreBoardService.getScoreBoard())
+                .extracting(Game::getUuid).containsExactly(game2.getUuid(), game3.getUuid(), game1.getUuid());
     }
 
 }

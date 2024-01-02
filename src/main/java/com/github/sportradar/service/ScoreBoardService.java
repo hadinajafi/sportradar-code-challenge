@@ -5,7 +5,9 @@ import com.github.sportradar.model.Score;
 import com.github.sportradar.model.Team;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
@@ -39,5 +41,19 @@ public class ScoreBoardService implements GameService {
         if (runningGame == null)
             throw new MissingResourceException("Couldn't find the game with uuid: " + uuid, "Game", uuid.toString());
         return runningGame;
+    }
+
+    public List<Game> getScoreBoard() {
+        return orderGames();
+    }
+
+    private List<Game> orderGames() {
+        return runningGames.values().stream().sorted((g1, g2) -> {
+            if (g1.getScore().getScoreSum() > g2.getScore().getScoreSum())
+                return -1;
+            else if (g1.getScore().getScoreSum() < g2.getScore().getScoreSum())
+                return 1;
+            return 0;
+        }).toList();
     }
 }
