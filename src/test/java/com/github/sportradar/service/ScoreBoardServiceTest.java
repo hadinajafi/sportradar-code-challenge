@@ -4,6 +4,7 @@ import com.github.sportradar.model.Team;
 import org.junit.jupiter.api.Test;
 
 import java.util.MissingResourceException;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -52,6 +53,11 @@ class ScoreBoardServiceTest {
     }
 
     @Test
+    void updateScoreWithInvalidGameShouldThrowException() {
+        assertThrows(MissingResourceException.class, () -> scoreBoardService.updateScore(UUID.randomUUID(), 2,2));
+    }
+
+    @Test
     void updateGameScoreOnlyUpdatedTheGivenGame() {
         var first = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
         var second = scoreBoardService.startGame(new Team("Team3"), new Team("Team4"));
@@ -94,6 +100,16 @@ class ScoreBoardServiceTest {
 
         assertThrows(MissingResourceException.class, () -> {
             scoreBoardService.getRunningGame(game.getUuid());
+        });
+    }
+
+    @Test
+    void updateScoreOfFinishedGameShouldThrowException() {
+        var game = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        scoreBoardService.finishGame(game.getUuid());
+
+        assertThrows(MissingResourceException.class, () -> {
+            scoreBoardService.updateScore(game.getUuid(), 1, 0);
         });
     }
 

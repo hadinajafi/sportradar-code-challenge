@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
 
-public class ScoreBoardService {
+public class ScoreBoardService implements GameService {
     private final Map<UUID, Game> runningGames = new HashMap<>();
 
 
@@ -22,6 +22,8 @@ public class ScoreBoardService {
 
     public Game updateScore(UUID gameUuid, Integer homeScore, Integer awayScore) {
         var game = runningGames.get(gameUuid);
+        if (game == null)
+            throw new MissingResourceException("Couldn't find the game with uuid: " + gameUuid, "Game", gameUuid.toString());
         game.setScore(new Score(homeScore, awayScore));
         return game;
     }
