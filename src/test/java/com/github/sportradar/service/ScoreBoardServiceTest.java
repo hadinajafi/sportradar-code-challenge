@@ -145,4 +145,23 @@ class ScoreBoardServiceTest {
                 .extracting(Game::getUuid).containsExactly(game4.getUuid(), game2.getUuid(), game3.getUuid(), game1.getUuid());
     }
 
+    @Test
+    void testWithSampleTestDataShouldPass() {
+        var game1 = scoreBoardService.startGame(new Team("Mexico"), new Team("Canada"));
+        var game2 = scoreBoardService.startGame(new Team("Spain"), new Team("Brazil"));
+        var game3 = scoreBoardService.startGame(new Team("Germany"), new Team("France"));
+        var game4 = scoreBoardService.startGame(new Team("Uruguay"), new Team("Italy"));
+        var game5 = scoreBoardService.startGame(new Team("Argentina"), new Team("Australia"));
+
+        scoreBoardService.updateScore(game1.getUuid(), 0, 5);
+        scoreBoardService.updateScore(game2.getUuid(), 10, 2);
+        scoreBoardService.updateScore(game3.getUuid(), 2, 2);
+        scoreBoardService.updateScore(game4.getUuid(), 6, 6);
+        scoreBoardService.updateScore(game5.getUuid(), 3, 1);
+
+        assertThat(scoreBoardService.getScoreBoard())
+                .extracting(Game::getUuid)
+                .containsExactly(game4.getUuid(), game2.getUuid(), game1.getUuid(), game5.getUuid(), game3.getUuid());
+    }
+
 }
