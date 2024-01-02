@@ -2,12 +2,12 @@ package com.github.sportradar.service;
 
 import com.github.sportradar.model.Game;
 import com.github.sportradar.model.Team;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.MissingResourceException;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -56,7 +56,7 @@ class ScoreBoardServiceTest {
 
     @Test
     void updateScoreWithInvalidGameShouldThrowException() {
-        assertThrows(MissingResourceException.class, () -> scoreBoardService.updateScore(UUID.randomUUID(), 2,2));
+        assertThrows(MissingResourceException.class, () -> scoreBoardService.updateScore(UUID.randomUUID(), 2, 2));
     }
 
     @Test
@@ -125,8 +125,24 @@ class ScoreBoardServiceTest {
         scoreBoardService.updateScore(game2.getUuid(), 1, 2);
         scoreBoardService.updateScore(game3.getUuid(), 0, 2);
 
-        Assertions.assertThat(scoreBoardService.getScoreBoard())
+        assertThat(scoreBoardService.getScoreBoard())
                 .extracting(Game::getUuid).containsExactly(game2.getUuid(), game3.getUuid(), game1.getUuid());
+    }
+
+    @Test
+    void getRunningGamesShouldOrderByStartDateWhenScoreSumIsEqual() {
+        var game1 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        var game2 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        var game3 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+        var game4 = scoreBoardService.startGame(new Team("Team1"), new Team("Team2"));
+
+        scoreBoardService.updateScore(game1.getUuid(), 1, 0);
+        scoreBoardService.updateScore(game2.getUuid(), 1, 2); //same score sum as game 4
+        scoreBoardService.updateScore(game3.getUuid(), 0, 2);
+        scoreBoardService.updateScore(game4.getUuid(), 2, 1); //same score sum as game 2
+
+        assertThat(scoreBoardService.getScoreBoard())
+                .extracting(Game::getUuid).containsExactly(game4.getUuid(), game2.getUuid(), game3.getUuid(), game1.getUuid());
     }
 
 }

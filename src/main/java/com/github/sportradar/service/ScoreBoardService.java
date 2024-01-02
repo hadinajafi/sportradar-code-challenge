@@ -53,7 +53,12 @@ public class ScoreBoardService implements GameService {
                 return -1;
             else if (g1.getScore().getScoreSum() < g2.getScore().getScoreSum())
                 return 1;
-            return 0;
+            else {
+                if (g1.getStartedAt().isBefore(g2.getStartedAt()))
+                    return 1;
+                else
+                    return -1;
+            }
         }).toList();
     }
 }
